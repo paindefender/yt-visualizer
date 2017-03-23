@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>View</title>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/chroma.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                var context = new (window.AudioContext || window.webkitAudioContext);
+                const fftSize = 2048;
+                var analyser;
+                analyser = context.createAnalyser();
+                analyser.fftSize = fftSize;
+                var videoElement = document.getElementById('vid');
+                var source = context.createMediaElementSource(videoElement);
+                source.connect(analyser);
+                analyser.connect(context.destination);
+                
+                var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+                
+                videoElement.onseeking = function() {
+                    console.log('seek');
+                    analyser = context.createAnalyser();
+                    analyser.fftSize = fftSize;
+                    videoElement = document.getElementById('vid');
+                    //source = context.createMediaElementSource(videoElement);
+                    source.connect(analyser);
+                    analyser.connect(context.destination);
+                };
+                j = 0;
+                function renderFrame() {
+                    requestAnimationFrame(renderFrame);
+                    analyser.getByteFrequencyData(frequencyData);
+                    var canvas = document.getElementById('canvas');
+                    var ctx = canvas.getContext('2d');
+                    canvas.width=1024;
+                    ctx.fillStyle = '#fff';
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                    var barWidth = Math.ceil(canvas.width/frequencyData.length);
+                    for (i = 0; i < frequencyData.length; i++){
+                        ctx.fillRect(i*barWidth,canvas.height,barWidth,-frequencyData[i]);
+                    }/*
+                    j++;
+                    j = j % canvas.width;
+                    for (i = 0; i < frequencyData.length; i++){
+
+                        var value = frequencyData[i];
+                        ctx.fillStyle = scale(value/255).hex();
+                        ctx.fillRect(j,canvas.height-i,1,1);
+                    }
+                    //ctx.translate(-1,0);
+                    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height,0,0,canvas.width,canvas.height);
+                    //ctx.setTransform(1,0,0,1,0,0);
+                    */
+                    //console.log(frequencyData);
+                }
+                videoElement.play();
+                renderFrame();
+            });
+        </script>
+        <style>
+            body{
+                background-color: #bf2626;
+                color: #ffffff;
+            }
+        </style>
+    </head>
+    <body style="width:100%;margin:0 0 0 0;padding:0 0 0 0;">
+        <h1><a style="color:#ffffff;text-decoration:none;" href='/'>YouTube-Visualiser</a></h1>
+        <div style="width:100%;margin:0 0 0 0;padding:0 0 0 0;">
+            <video controls id="vid" style="float:left;width:640px;height:360px;margin:0;padding:0;">
+                <source src="<%= vid%>" type="video/webm"></source>
+                not supported
+            </video>
+            <canvas id="canvas" width="640" height="360" style="float:right;width:640px;height:360px;margin:0;padding:0;">
+                
+            </canvas>
+        </div>
+        <div>
+        </div>
+    </body>
+</html>

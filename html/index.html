@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>yv</title>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <style>
+            body{
+                background-color: #bf2626;
+                text-align: center;
+                color: #ffffff;
+            }
+            .button{
+                background-color: #e52d27;
+                border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 1em;
+                border-radius: 6px;
+            }
+            .input{
+                border:none;
+                padding: 15px 32px;
+                font-size: 1em;
+                border-radius: 6px;
+                width: 25em;
+            }
+            h1{
+                font-size: 2.5em;
+            }
+            .loader{
+                margin:0;
+                position: relative;
+                top:50%;
+                left:50%;
+                border: 12px solid #f3f3f3;
+                border-top: 12px solid #e52d27;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 5s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            #frame{
+                position:absolute;
+                border: 0;
+                top:0;
+                bottom:0;
+                left:0;
+                right:0;
+                height:100%;
+                width:100%;
+            }
+        </style>
+        <script>
+            var v;
+            $(document).ready(function(){
+                $('#frame').hide();
+                $('#load').hide();
+                $('#go').click(function(){
+                    var url = $("#v").val();
+                    v = url.substr(url.indexOf("=") + 1, 11);
+                    $('#load').show();
+                    $.ajax({
+                        method: "GET",
+                        url: "d",
+                        data: {v: v}
+                    })
+                    .done(function(){
+                        $('#load').hide();
+                        $('#frame').attr('src', 'view?v=' + v);
+                        $('#frame').show();
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="container" style="padding-top:10%">
+            <h1>YouTube-Visualiser</h1>
+                <input id="v" class="input" name="v" type="text" placeholder="enter video url">
+                </input>
+                <button id="go" class="button">
+                    go
+                </button>
+        </div>
+        <div id="load" class="loader" style="float:left"></div>
+        <div>
+            <iframe id="frame" src='view'>
+            </iframe>
+        </div>
+    </body>
+</html>
